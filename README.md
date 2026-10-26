@@ -2,11 +2,11 @@
 
 [![check](https://github.com/wuyaomin248-stack/dsh-discord/actions/workflows/check.yml/badge.svg)](https://github.com/wuyaomin248-stack/dsh-discord/actions/workflows/check.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![version](https://img.shields.io/badge/version-0.4.1-green.svg)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.5.0-green.svg)](CHANGELOG.md)
 
 Discord 只读搜索与信息获取。凭证自动从浏览器 Local Storage 取，不用手抄 token。
 
-**20 个工具，全部只读**——不发消息、不改状态、不需要 bot。
+**25 个工具，全部只读**——不发消息、不改状态、不需要 bot。
 
 ```
 npm i -g 无；直接 clone 到 profile 的 node_modules 即可
@@ -21,7 +21,7 @@ git clone https://github.com/wuyaomin248-stack/dsh-discord.git \
   ~/.dsh/profiles/desktop/node_modules/dsh-discord
 
 # 2. 注册（profiles/desktop/package.json 两处）
-#    dependencies:          "dsh-discord": "0.4.1"
+#    dependencies:          "dsh-discord": "0.5.0"
 #    dsh.profile.bundles:   "dsh-discord"
 
 # 3. 重启 DSH，然后
@@ -32,16 +32,21 @@ discord_accounts        # 能列出 valid: true 就通了
 
 ## 干什么
 
-20 个工具，全部只读——不发消息、不改状态：
+25 个工具，全部只读——不发消息、不改状态：
 
 | 工具 | 用途 |
 |---|---|
 | `discord_accounts` | 看本机能抓到哪些账号（自动验证） |
+| `discord_use` | **多账号切换**：进程内换当前账号 |
+| `discord_user` | **查用户资料**：创建时间、徽章、头像 |
 | `discord_servers` | 账号所在的服务器列表 |
+| `discord_guild_info` | **服务器详情**：规模、boost、特性、验证等级 |
+| `discord_invite` | **解析邀请链接**：不加群先看里面是什么 |
 | `discord_channels` | 服务器下的频道结构 |
 | `discord_channel_info` | 单个频道详情 |
-| `discord_messages` | 读频道消息（可翻页） |
+| `discord_messages` | 读频道消息（翻页 + since/until 时间过滤） |
 | `discord_context` | **读某条消息前后文**（`?around=`） |
+| `discord_reactions` | **表情回应**：汇总 + 谁点了哪个表情 |
 | `discord_pins` | 置顶消息（规则/公告/资料） |
 | `discord_search` | **服务端搜索**：关键词 + 作者 + 频道 + 时间 + 附件类型 |
 | `discord_filter` | **本地过滤**：正则/关键词翻历史 |

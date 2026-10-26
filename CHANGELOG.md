@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.5.0 — 2026-10-26
+
+20 → 25 个工具，全部只读。
+
+**新增 5 个工具**
+
+- `discord_use`：多账号切换。进程内换当前账号（用户名/显示名/ID 子串匹配），
+  之后所有工具用被切换的账号；不带参数列出全部账号及验证状态。
+- `discord_user`：查单个用户资料。账号创建时间（snowflake 解出）、徽章
+  （public_flags 位解读：Staff/合作伙伴/HypeSquad/早期支持者等）、头像/横幅链接。
+  传 `me` 或留空查当前账号，`<@123>` 提及形式自动清洗。
+- `discord_guild_info`：服务器详情。成员数/在线数、boost 等级与数量、
+  features 中文解读（社区/合作伙伴/可发现/自动管理等）、验证等级、
+  NSFW 分级、vanity 链接；`channels: true` 附各类型频道统计。
+- `discord_invite`：解析邀请链接。不加入就能看服务器名、成员数、指向频道、
+  过期时间、邀请人。支持 `discord.gg/xxx`、`discord.com/invite/xxx`、裸码。
+- `discord_reactions`：消息表情回应。不传 emoji 返回全部表情及数量汇总；
+  传 emoji 返回点了这个表情的用户列表（自定义表情自动转成 `name:id` 形式）。
+
+**增强**
+
+- `discord_messages` 支持 `since` / `until` 按时间过滤（snowflake 边界换算），
+  「看昨天这个频道聊了什么」不再需要先找消息 ID。
+- `compactMessage` 输出补四类内容，之前这些消息看起来像空的：
+  贴纸（`sticker_items` 名字）、投票（问题 + 选项 + 当前票数）、
+  转发快照（`message_snapshots` 展开 300 字）、非默认消息类型
+  （join/pin/boost/系统提示，标 `type` 字段）。
+- `primary()` 支持偏好账号：有偏好时按 token 逐个验证直到匹配，
+  匹配不到退回第一个有效账号；无偏好时行为与之前完全一致。
+
+**修复**
+
+- `discord_pins` 的 output schema 之前是空 `properties: {}`，补全。
+
 ## 0.4.1 — 2026-10-26
 
 工程化补齐，工具行为无变化。

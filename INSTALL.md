@@ -1,6 +1,6 @@
 # 安装说明
 
-dsh-discord 是 DSH Desktop 的插件，**20 个只读工具**，用于 Discord 搜索与信息获取。
+dsh-discord 是 DSH Desktop 的插件，**25 个只读工具**，用于 Discord 搜索与信息获取。
 
 ## 装到哪
 
@@ -24,7 +24,7 @@ git clone https://github.com/wuyaomin248-stack/dsh-discord.git \
 **1. dependencies 里加一行**
 
 ```json
-"dsh-discord": "0.4.1",
+"dsh-discord": "0.5.0",
 ```
 
 **2. dsh.profile.bundles 数组里加一项**
@@ -84,7 +84,7 @@ dsh-discord/
 ├── INSTALL.md            本文件
 ├── CHANGELOG.md          版本记录
 ├── lib/
-│   ├── index.js          20 个工具的定义与注册
+│   ├── index.js          25 个工具的定义与注册
 │   ├── api.js            Discord REST 客户端（限速/重试/代理）
 │   ├── token.js          从浏览器 leveldb 抓 token
 │   ├── search.js         服务端搜索 + 本地过滤 + 上下文窗口拆解
@@ -107,9 +107,10 @@ node verify-improve.mjs    # 标记清洗 + 频道名补齐
 node verify-export.mjs     # 导出落盘
 node test-plugin-tools.mjs # 插件判型工具
 node test-archive.mjs      # 整频道归档
+node test-050-tools.mjs    # 0.5.0 新工具（查人/服务器详情/切账号/时间过滤）
 ```
 
-`load-test.mjs` 不需要网络也不需要 token，可用来确认 20 个工具全部注册成功。
+`load-test.mjs` 不需要网络也不需要 token，可用来确认 25 个工具全部注册成功。
 
 ## 安全
 
