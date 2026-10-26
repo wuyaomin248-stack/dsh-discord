@@ -1,0 +1,65 @@
+{
+  "name": "dsh-discord",
+  "version": "0.4.0",
+  "description": "Discord read/search toolkit for DeepSeek Harness: pull the signed-in token straight from Edge/Chrome leveldb, then search messages, archive whole channels, read context, download attachments with card/plugin detection, and pick random verified cards or plugins — all read-only, no browser needed.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/token.js",
+    "lib/api.js",
+    "lib/search.js",
+    "lib/format.js",
+    "lib/download.js",
+    "lib/cards.js",
+    "cordis.patch.yml",
+    "lib/plugins.js"
+  ],
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "discord",
+    "search",
+    "archive",
+    "read-only"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "^3.18.4"
+  },
+  "optionalDependencies": {
+    "undici": "^7.0.0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-tools": "^0.1.7-rc.1 || ^0.2.0-rc.1",
+    "@deepseek-ai/schemastery": "^3.18.4"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-tools": {
+      "optional": true
+    },
+    "@deepseek-ai/schemastery": {
+      "optional": true
+    }
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "cordis.patch.yml"
+    },
+    "engines": {
+      "dsh": ">=0.1.7-rc.1"
+    }
+  }
+}

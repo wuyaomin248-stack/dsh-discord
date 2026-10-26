@@ -1,0 +1,5 @@
+# dsh-discord 的加载条目：把插件挂进 profile 树。
+# 配置全部有默认值，装好即可用；改 token 来源等见 dsh-discord 工具参数。
+- insert:
+    - id: dsh-discord
+      name: 'dsh-discord'
