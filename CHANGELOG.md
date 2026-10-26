@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.5.1 — 2026-10-26
+
+修一个 0.5.0 上线后才暴露的致命 bug：**几乎所有工具在宿主里实调都会失败**。
+
+- 症状：重启后调 `discord_user` 报
+  `tool "discord_user" returned invalid output: "value.source" is not a declared property (additionalProperties: false)`。
+- 根因：`envelope()` 给每个返回附加 `source` 字段，但各工具的 output schema 是
+  `additionalProperties: false` 白名单，`source` 从未声明；嵌套层（`messages` 的
+  items、`accounts` 的 items）同样是白名单且几乎没声明任何字段。之前 load-test
+  直接调 `execute()` 绕过了宿主校验，所以一直没暴露。
+- 修法：包装 `defineTool`，注册前递归把 output schema 里所有
+  `type: "object" && additionalProperties === false` 的节点放宽为 `true`。
+  顶层、`properties` 嵌套、`items` 嵌套一次覆盖。字段级类型声明仍然生效。
+- `load-test.mjs` 补 `validateOut()`：复刻宿主的白名单校验语义，对
+  `discord_servers` 与 `discord_search` 的实调结果各校验一次，schema 不合规直接
+  退出码 1。这是本次事故的回归网——下次不用等重启才发现。
+
 ## 0.5.0 — 2026-10-26
 
 20 → 25 个工具，全部只读。

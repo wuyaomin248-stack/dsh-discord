@@ -24,7 +24,7 @@ git clone https://github.com/wuyaomin248-stack/dsh-discord.git \
 **1. dependencies 里加一行**
 
 ```json
-"dsh-discord": "0.5.0",
+"dsh-discord": "0.5.1",
 ```
 
 **2. dsh.profile.bundles 数组里加一项**

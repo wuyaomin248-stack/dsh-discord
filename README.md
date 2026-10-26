@@ -2,7 +2,7 @@
 
 [![check](https://github.com/wuyaomin248-stack/dsh-discord/actions/workflows/check.yml/badge.svg)](https://github.com/wuyaomin248-stack/dsh-discord/actions/workflows/check.yml)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![version](https://img.shields.io/badge/version-0.5.0-green.svg)](CHANGELOG.md)
+[![version](https://img.shields.io/badge/version-0.5.1-green.svg)](CHANGELOG.md)
 
 Discord 只读搜索与信息获取。凭证自动从浏览器 Local Storage 取，不用手抄 token。
 
@@ -21,7 +21,7 @@ git clone https://github.com/wuyaomin248-stack/dsh-discord.git \
   ~/.dsh/profiles/desktop/node_modules/dsh-discord
 
 # 2. 注册（profiles/desktop/package.json 两处）
-#    dependencies:          "dsh-discord": "0.5.0"
+#    dependencies:          "dsh-discord": "0.5.1"
 #    dsh.profile.bundles:   "dsh-discord"
 
 # 3. 重启 DSH，然后

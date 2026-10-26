@@ -76,7 +76,8 @@ ok(`${srcFiles.length} 个 js/mjs 文件语法正确`);
 // ---------- 4. 工具注册一致性 ----------
 console.log("\n=== 4. 工具注册 ===");
 const idx = fs.readFileSync(path.join(root, "lib/index.js"), "utf8");
-const defs = (idx.match(/defineTool\(/g) || []).length;
+// 只数注册点：ctx.tools.register(defineTool({ ... }))，别把 import 别名和包装函数算进来
+const defs = (idx.match(/register\(\s*defineTool\(/g) || []).length;
 const names = [...new Set([...idx.matchAll(/name:\s*"([a-z0-9_]+)"/g)].map((m) => m[1]))]
   .filter((n) => n.startsWith("discord_"));
 if (defs !== names.length) fail(`defineTool ${defs} 次，但找到 ${names.length} 个 discord_* 工具名`);

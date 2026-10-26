@@ -4,6 +4,31 @@
  */
 const registered = [];
 
+/**
+ * 模拟宿主的 output 白名单校验（0.5.0 事故的回归网）。
+ * 语义对齐：object 类型 + additionalProperties:false 时拒绝未声明字段，
+ * properties/items 递归下钻。宿主报错格式形如
+ * "value.source is not a declared property (additionalProperties: false)"。
+ */
+function validateOut(value, schema, path = "value") {
+  if (!schema || typeof schema !== "object") return [];
+  const errs = [];
+  if (schema.type === "object" && value && typeof value === "object" && !Array.isArray(value)) {
+    const props = schema.properties || {};
+    if (schema.additionalProperties === false) {
+      for (const k of Object.keys(value)) {
+        if (!(k in props)) errs.push(`${path}.${k} is not a declared property`);
+      }
+    }
+    for (const [k, sub] of Object.entries(props)) {
+      if (value[k] !== undefined) errs.push(...validateOut(value[k], sub, `${path}.${k}`));
+    }
+  } else if (schema.type === "array" && Array.isArray(value)) {
+    value.forEach((v, i) => errs.push(...validateOut(v, schema.items, `${path}[${i}]`)));
+  }
+  return errs;
+}
+
 const fakeCtx = {
   logger: { info: () => {}, warn: console.warn, error: console.error },
   effect: () => {},
@@ -73,6 +98,13 @@ try {
   console.log("  账号:", res.account?.username);
   console.log("  服务器数:", res.servers?.length);
   res.servers?.slice(0, 3).forEach((s) => console.log("    -", s.name, s.id));
+  const errs = validateOut(res, tool.output?.schema);
+  if (errs.length) {
+    console.log("  ✗ output schema 校验失败（宿主会拒收）:");
+    errs.slice(0, 5).forEach((e) => console.log("    -", e));
+    process.exit(1);
+  }
+  console.log("  ✓ output schema 白名单校验通过");
 } catch (e) {
   console.log("  ✗ 调用失败:", e.message);
 }
@@ -91,6 +123,13 @@ if (st) {
     res.messages?.slice(0, 2).forEach((m) =>
       console.log(`    [${m.time?.slice(0, 16)}] ${m.author}: ${(m.content || "").slice(0, 50)}`)
     );
+    const errs = validateOut(res, st.output?.schema);
+    if (errs.length) {
+      console.log("  ✗ output schema 校验失败（宿主会拒收）:");
+      errs.slice(0, 5).forEach((e) => console.log("    -", e));
+      process.exit(1);
+    }
+    console.log("  ✓ output schema 白名单校验通过");
   } catch (e) {
     console.log("  ✗ 搜索失败:", e.message);
   }
