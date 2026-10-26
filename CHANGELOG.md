@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.4.1 — 2026-10-26
+
+工程化补齐，工具行为无变化。
+
+- **`scripts/check.mjs`**：离线自检。不联网、不要 token、不需要 `@deepseek-ai/*`，
+  检查 package.json 字段、必需文件、全部 js/mjs 语法、工具数量与命名、敏感信息、
+  README 工具表与代码是否一致。之前这些全靠手工核对，漏过一次（INSTALL.md 写「14 个工具」而代码是 20 个）。
+- **`scripts/link-deps.mjs`**：自动探测 DSH 安装目录并把 `@deepseek-ai/*` 链到插件自己的
+  `node_modules/`。之前 clone 下来直接 `node load-test.mjs` 会报
+  `ERR_MODULE_NOT_FOUND: Cannot find package '@deepseek-ai/dsh-tools'`，得手工敲三条 mklink。
+- **`.github/workflows/check.yml`**：CI 在 ubuntu 和 windows 各跑一次离线自检。
+- **package.json** 补 `repository` / `bugs` / `homepage` / `scripts`（10 条），
+  `files` 从逐个列举改成目录（`lib/`、`scripts/`），之前新增 `cards.js`、`plugins.js`
+  时忘记加进 files，npm 打包会漏。
+- **README** 加状态徽章和快速开始，本地调试段落改成从 clone 开始（之前默认你已经在安装目录里）。
+
 ## 0.4.0 — 2026-10-26
 
 新增 `discord_archive`：翻页拉整个频道 / 整个帖子的全量历史，存 Markdown。

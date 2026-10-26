@@ -1,6 +1,34 @@
 # dsh-discord
 
+[![check](https://github.com/wuyaomin248-stack/dsh-discord/actions/workflows/check.yml/badge.svg)](https://github.com/wuyaomin248-stack/dsh-discord/actions/workflows/check.yml)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![version](https://img.shields.io/badge/version-0.4.1-green.svg)](CHANGELOG.md)
+
 Discord 只读搜索与信息获取。凭证自动从浏览器 Local Storage 取，不用手抄 token。
+
+**20 个工具，全部只读**——不发消息、不改状态、不需要 bot。
+
+```
+npm i -g 无；直接 clone 到 profile 的 node_modules 即可
+git clone https://github.com/wuyaomin248-stack/dsh-discord.git
+```
+
+## 快速开始
+
+```bash
+# 1. 放到 DSH profile
+git clone https://github.com/wuyaomin248-stack/dsh-discord.git \
+  ~/.dsh/profiles/desktop/node_modules/dsh-discord
+
+# 2. 注册（profiles/desktop/package.json 两处）
+#    dependencies:          "dsh-discord": "0.4.1"
+#    dsh.profile.bundles:   "dsh-discord"
+
+# 3. 重启 DSH，然后
+discord_accounts        # 能列出 valid: true 就通了
+```
+
+前提：浏览器里登录过 discord.com。
 
 ## 干什么
 
@@ -207,16 +235,49 @@ discord_plugins(forumId="...", scan=true)  # 列出帖子 + 每个有没有 zip/
 ## 本地调试
 
 ```bash
-cd ~/.dsh/profiles/desktop/node_modules/dsh-discord
-node smoke.mjs            # 抓 token + 打通 API
-node scenario.mjs         # 真实搜索场景
-node load-test.mjs        # 插件加载 + 工具注册
-node verify-improve.mjs   # 标记清洗 + 频道名补齐
-node verify-export.mjs    # 导出落盘
+git clone https://github.com/wuyaomin248-stack/dsh-discord.git
+cd dsh-discord
+
+node scripts/link-deps.mjs   # 链上 @deepseek-ai/*（只需一次）
+node scripts/check.mjs       # 离线自检：结构/语法/工具数/敏感信息
 ```
 
-`node_modules/@deepseek-ai/` 下的 junction 指向 DSH 安装目录，仅供这些脚本
+`link-deps.mjs` 会自动探测 DSH 安装目录，探不到就手动指定：
+
+```bash
+node scripts/link-deps.mjs "D:/Apps/DSH/resources/app"
+```
+
+之后可以跑需要网络和 token 的实测脚本：
+
+```bash
+node load-test.mjs         # 插件加载 + 20 工具注册（最快，先跑这个）
+node smoke.mjs             # 抓 token + 打通 API
+node scenario.mjs          # 真实搜索场景
+node verify-improve.mjs    # 标记清洗 + 频道名补齐
+node verify-export.mjs     # 导出落盘
+node test-plugin-tools.mjs # 插件判型
+node test-archive.mjs      # 整频道归档
+```
+
+也可以用 npm scripts：
+
+```bash
+npm run check          # = node scripts/check.mjs
+npm run test:load
+npm run test:smoke
+```
+
+`node_modules/@deepseek-ai/` 下的链接指向 DSH 安装目录，仅供这些脚本
 本地运行；DSH 运行时由宿主自己解析，不依赖它。
+
+## 贡献
+
+改完代码推之前跑一遍 `npm run check`——它不联网、不要 token，检查：
+package.json 字段、必需文件、全部 js/mjs 语法、工具数量与命名、敏感信息、
+README 工具表与代码是否一致。
+
+CI 在两个平台各跑一次（ubuntu + windows），验证路径分支都正常。
 
 ## 踩过的坑
 

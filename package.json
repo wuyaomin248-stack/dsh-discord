@@ -1,6 +1,6 @@
 {
   "name": "dsh-discord",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Discord read/search toolkit for DeepSeek Harness: pull the signed-in token straight from Edge/Chrome leveldb, then search messages, archive whole channels, read context, download attachments with card/plugin detection, and pick random verified cards or plugins — all read-only, no browser needed.",
   "type": "module",
   "main": "lib/index.js",
@@ -9,15 +9,13 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "lib/index.js",
-    "lib/token.js",
-    "lib/api.js",
-    "lib/search.js",
-    "lib/format.js",
-    "lib/download.js",
-    "lib/cards.js",
+    "lib/",
     "cordis.patch.yml",
-    "lib/plugins.js"
+    "README.md",
+    "INSTALL.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "scripts/"
   ],
   "keywords": [
     "deepseek-harness",
@@ -29,6 +27,26 @@
     "read-only"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wuyaomin248-stack/dsh-discord.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wuyaomin248-stack/dsh-discord/issues"
+  },
+  "homepage": "https://github.com/wuyaomin248-stack/dsh-discord#readme",
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "link-deps": "node scripts/link-deps.mjs",
+    "test:load": "node load-test.mjs",
+    "test:smoke": "node smoke.mjs",
+    "test:scenario": "node scenario.mjs",
+    "test:format": "node verify-improve.mjs",
+    "test:export": "node verify-export.mjs",
+    "test:plugins": "node test-plugin-tools.mjs",
+    "test:archive": "node test-archive.mjs",
+    "test": "node scripts/check.mjs"
+  },
   "engines": {
     "node": ">=20"
   },
