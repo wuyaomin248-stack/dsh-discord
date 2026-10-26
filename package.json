@@ -1,12 +1,13 @@
 {
   "name": "dsh-discord",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "Discord read/search toolkit for DeepSeek Harness: pull the signed-in token straight from Edge/Chrome leveldb, then search messages, archive whole channels, read context, download attachments with card/plugin detection, and pick random verified cards or plugins — all read-only, no browser needed.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
     ".": "./lib/index.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
   },
   "files": [
     "lib/",

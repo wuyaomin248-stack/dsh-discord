@@ -129,6 +129,40 @@ console.log("\n=== 4.5 校验器自检（防 null/白名单漏网）===");
   console.log(`  ✓ ${cases.length} 个用例全部符合宿主语义`);
 }
 
+console.log("\n=== 4.6 output.render 契约（0.5.3 事件回归网）===");
+{
+  // 宿主 defineTool 会无条件调 output.render(args, value)；工具只写 schema 不写
+  // render 时那层包装拿到 undefined，实调必炸 "userRender is not a function"。
+  // 注册阶段看不出来（包装是函数），所以这里逐个真调一遍。
+  let bad = 0;
+  for (const t of registered) {
+    const render = t.output?.render;
+    if (typeof render !== "function") {
+      console.log(`  ✗ ${t.name} 没有 output.render`);
+      bad++;
+      continue;
+    }
+    let out;
+    try {
+      out = render({}, { ok: true, items: [1, 2] });
+    } catch (e) {
+      console.log(`  ✗ ${t.name} render 抛错: ${e.message}`);
+      bad++;
+      continue;
+    }
+    const okShape =
+      Array.isArray(out) &&
+      out.length > 0 &&
+      out.every((b) => b && b.type === "text" && typeof b.text === "string");
+    if (!okShape) {
+      console.log(`  ✗ ${t.name} render 返回值不是 text block 数组: ${JSON.stringify(out)?.slice(0, 120)}`);
+      bad++;
+    }
+  }
+  if (bad) process.exit(1);
+  console.log(`  ✓ ${registered.length} 个工具的 render 都返回 text block`);
+}
+
 console.log("\n=== 5. 实调一个只读工具（discord_servers）===");
 const tool = registered.find((t) => t.name === "discord_servers");
 if (!tool) {

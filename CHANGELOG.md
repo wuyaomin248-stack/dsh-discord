@@ -1,5 +1,45 @@
 # Changelog
 
+## 0.5.3 — 2026-10-27
+
+**修 25 个工具全部实调失败：`output.render failed: userRender is not a function`**
+
+- 症状：工具能出现在列表里、`execute` 也真跑完（Discord 请求都发出去了），但宿主拿结果时统一报
+  `tool "<name>" returned invalid output: output.render failed: userRender is not a function`。
+- 根因：宿主 `dsh-tools` 的 `defineTool()` 会先抓 `const userRender = options.output.render`，
+  再无条件包一层 `render(args, value) { return userRender(args, value) }`。
+  本插件 25 个工具只声明了 `output.schema`、没声明 `output.render`，包装层拿到 `undefined`，
+  调用即 TypeError。注册阶段查不出来——包装函数本身是 `function`，所以 `register()` 的白名单检查放行，
+  只有实调才炸。
+- 修法：插件自己的 `defineTool()` 包装里补默认渲染（`defaultRender`），结构化结果转成
+  `[{ type: "text", text: JSON.stringify(value, null, 1) }]`，一处改动覆盖全部 25 个工具。
+- 回归网：`load-test.mjs` 新增第 4.6 节，逐个真调每个工具的 `output.render({}, 样例值)`，
+  断言返回非空 text block 数组——只检查「有没有定义 render」不够，必须真调一次。
+
+**`discord_reactions` 改用 around 取消息（原来对用户 token 必挂）**
+
+- `GET /channels/{cid}/messages/{mid}` 只对 bot token 开放，浏览器抓来的用户 token 调它一律
+  `403 只有机器人可使用此端点`。`api.getMessage()` 改为 `?around=<id>&limit=5` 取周边再挑出目标，
+  找不到时抛 404 而不是静默返回别的消息。
+
+**`fetchStarter()` 换成 `after=0`（原来定位不到大帖主帖）**
+
+- 旧实现从最新消息往前翻，`maxPages=6` 只覆盖 600 条；1767 条的预设帖只能翻到中间，
+  取回来的「主帖」完全不在开头，`discord_card` / `discord_plugin` 因此抽不到附件。
+- 改为 `getMessages({ limit: 100, after: "0" })` 一次取最早一批（返回仍按新→旧），
+  取数组最后一个即主帖。实测 RUAN 预设帖精确命中 `1540275527687077989` 与其 `RUAN_1.4.json`。
+
+**重启后工具全消失（`unknown tool "discord_user"`）——补三处**
+
+- `exports` 缺 `./cordis.patch.yml`：宿主按包名解析 bundle 的 patch 时会抛
+  `ERR_PACKAGE_PATH_NOT_EXPORTED`（同机 `dsh-remote` 导出了这个子路径，能正常挂载）。已补该子路径。
+- 注册壳：调用点从 `ctx.tools.register(...)` 换成局部 `register(...)`（内部 try/catch，单个工具失败不再让全部工具一起消失），
+  `apply` 结束时用 `ctx.logger` 打一行「dsh-discord 就绪：N 个工具已注册」（或失败清单）。
+  **不要给 ctx 赋值、也不要 `Object.create(ctx)` 后挂属性**：cordis 的 Context 是 Proxy，会抛
+  `cannot set property "tools" in multiple fibers`，整个 `apply` 直接失败、一个工具都注册不上。
+  这个坑真实发生过一次（2026-10-27）：一开始日志里只有 `unknown tool`，加了壳才看见真实报错。
+- profile 依赖从精确 `0.5.2` 改成 `^0.5.3`：本机唯一一个「声明版本不满足已装版本」的包。
+
 ## 0.5.2 — 2026-10-26
 
 0.5.1 之后继续排查同类问题，按宿主校验器的实际语义逐个对了一遍。
