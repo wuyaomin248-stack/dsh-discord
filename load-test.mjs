@@ -5,16 +5,25 @@
 const registered = [];
 
 /**
- * 模拟宿主的 output 白名单校验（0.5.0 事故的回归网）。
- * 语义对齐：object 类型 + additionalProperties:false 时拒绝未声明字段，
- * properties/items 递归下钻。宿主报错格式形如
- * "value.source is not a declared property (additionalProperties: false)"。
+ * 模拟宿主的 output 白名单校验（0.5.0/0.5.1 两次事故的回归网）。
+ * 语义对齐 dsh-tools 的 validateJsonSchemaValue：
+ *   - type:object 遇 null/数组 → "must be an object"（null 不是 plain record）
+ *   - type:string 遇 null → "must be a string"
+ *   - additionalProperties:false → 未声明字段报错
+ *   - type:json / 无 type → 放行任意值
  */
 function validateOut(value, schema, path = "value") {
   if (!schema || typeof schema !== "object") return [];
-  const errs = [];
-  if (schema.type === "object" && value && typeof value === "object" && !Array.isArray(value)) {
+  const t = schema.type;
+  if (t === undefined || t === "json") return [];
+
+  if (t === "object") {
+    if (value === null || typeof value !== "object" || Array.isArray(value)) {
+      const got = value === null ? "null" : Array.isArray(value) ? "array" : typeof value;
+      return [`${path} must be an object (got ${got})`];
+    }
     const props = schema.properties || {};
+    const errs = [];
     if (schema.additionalProperties === false) {
       for (const k of Object.keys(value)) {
         if (!(k in props)) errs.push(`${path}.${k} is not a declared property`);
@@ -23,10 +32,21 @@ function validateOut(value, schema, path = "value") {
     for (const [k, sub] of Object.entries(props)) {
       if (value[k] !== undefined) errs.push(...validateOut(value[k], sub, `${path}.${k}`));
     }
-  } else if (schema.type === "array" && Array.isArray(value)) {
-    value.forEach((v, i) => errs.push(...validateOut(v, schema.items, `${path}[${i}]`)));
+    return errs;
   }
-  return errs;
+  if (t === "array") {
+    if (!Array.isArray(value)) return [`${path} must be an array`];
+    const errs = [];
+    value.forEach((v, i) => errs.push(...validateOut(v, schema.items, `${path}[${i}]`)));
+    return errs;
+  }
+  if (t === "string") return typeof value === "string" ? [] : [`${path} must be a string`];
+  if (t === "number" || t === "integer") {
+    return typeof value === "number" ? [] : [`${path} must be a number`];
+  }
+  if (t === "boolean") return typeof value === "boolean" ? [] : [`${path} must be a boolean`];
+  if (t === "null") return value === null ? [] : [`${path} must be null`];
+  return [];
 }
 
 const fakeCtx = {
@@ -86,6 +106,29 @@ for (const t of registered) {
 }
 if (!bad) console.log("  ✓ 全部", registered.length, "个工具定义完整");
 
+console.log("\n=== 4.5 校验器自检（防 null/白名单漏网）===");
+{
+  // [值, schema, 期望是否有错, 说明]
+  const cases = [
+    [{ card: null }, { type: "object", additionalProperties: false, properties: { card: { type: "object", additionalProperties: true } } }, true, "object 遇 null 应报错"],
+    [{ card: null }, { type: "object", additionalProperties: false, properties: { card: { type: "json" } } }, false, "json 允许 null"],
+    [{ note: null }, { type: "object", additionalProperties: false, properties: { note: { type: "string" } } }, true, "string 遇 null 应报错"],
+    [{ ok: 1, extra: 2 }, { type: "object", additionalProperties: false, properties: { ok: { type: "number" } } }, true, "未声明字段应报错"],
+    [{ ok: 1, extra: 2 }, { type: "object", additionalProperties: true, properties: { ok: { type: "number" } } }, false, "放宽后允许多余字段"],
+  ];
+  let selfBad = 0;
+  for (const [val, sch, shouldErr, label] of cases) {
+    const errs = validateOut(val, sch);
+    const gotErr = errs.length > 0;
+    if (gotErr !== shouldErr) {
+      console.log(`  ✗ ${label}：期望${shouldErr ? "报错" : "通过"}，实际${gotErr ? "报错" : "通过"} ${errs[0] || ""}`);
+      selfBad++;
+    }
+  }
+  if (selfBad) process.exit(1);
+  console.log(`  ✓ ${cases.length} 个用例全部符合宿主语义`);
+}
+
 console.log("\n=== 5. 实调一个只读工具（discord_servers）===");
 const tool = registered.find((t) => t.name === "discord_servers");
 if (!tool) {
@@ -135,8 +178,40 @@ if (st) {
   }
 }
 
-console.log("\n=== 7. 参数错误处理 ===");
-const chTool = registered.find((t) => t.name === "discord_channels");
+console.log("\n=== 6.5 默认输出目录（不传 outDir 时落到哪）===");
+{
+  const ex = registered.find((t) => t.name === "discord_export");
+  if (!ex) {
+    console.log("  ✗ 没找到 discord_export");
+    process.exit(1);
+  }
+  const os = await import("node:os");
+  const pathMod = await import("node:path");
+  const fsMod = await import("node:fs");
+  try {
+    const r = await ex.execute({
+      guildId: "1134557553011998840",
+      query: "LCP",
+      pages: 1,
+      title: "load-test-tmp",
+    });
+    const home = os.default.homedir();
+    const downloads = pathMod.default.join(home, "Downloads");
+    const expectRoot = fsMod.default.existsSync(downloads) ? downloads : home;
+    if (!String(r.path).startsWith(expectRoot)) {
+      console.log(`  ✗ 落到了 ${r.path}，期望在 ${expectRoot} 下（宿主 cwd 是安装目录，不能写那里）`);
+      process.exit(1);
+    }
+    console.log("  ✓ 落在", r.path);
+    fsMod.default.unlinkSync(r.path);
+    console.log("  ✓ 测试文件已清理");
+  } catch (e) {
+    console.log("  ✗", e.message);
+    process.exit(1);
+  }
+}
+
+console.log("\n=== 7. 参数错误处理 ===");const chTool = registered.find((t) => t.name === "discord_channels");
 try {
   await chTool.execute({ guildId: "000000000000000000" });
   console.log("  ✗ 无效 guildId 居然成功了");

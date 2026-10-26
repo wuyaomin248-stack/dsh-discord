@@ -1,5 +1,35 @@
 # Changelog
 
+## 0.5.2 — 2026-10-26
+
+0.5.1 之后继续排查同类问题，按宿主校验器的实际语义逐个对了一遍。
+
+**修 null 输出（同 0.5.1 的第二波，抽不到东西时才触发）**
+
+宿主 `dsh-tools` 的校验器里，`type: "object"` 遇 `null` 直接报
+`must be an object`（`null` 不算 plain record），`type: "string"` 遇 `null` 报
+`must be a string`。而这些字段在「没抽到 / 空频道」时正是 `null`：
+
+- `discord_card`：`card`、`picked` → `json`
+- `discord_plugin`：`plugin`、`picked` → `json`
+- `discord_threads`：`note`（单频道无更多时是 null）→ `json`
+- `discord_archive`：`firstMessageAt`、`lastMessageAt`（空频道）→ `json`
+
+`load-test.mjs` 的 `validateOut()` 补上 null 语义，并加一节校验器自检
+（5 个用例，覆盖 object/string 遇 null、白名单拒收、放宽放行），防止校验网本身失灵。
+
+**默认输出目录不再用 `process.cwd()`**
+
+`discord_export` / `discord_archive` / `discord_download` 不传 `dir`/`outDir` 时，
+之前落到 `process.cwd()`——在 DSH 宿主里那是安装目录（app.asar 旁边），
+写进去可能没权限、用户也找不到。改为 `~/Downloads`，没有就落 home。
+
+**代理挂掉自动旁路**
+
+本机代理（FlClashCore 之类）重启期间，所有请求直接失败、整个插件跟着不可用。
+现在识别出「代理连不上」（`proxy` / `ECONNREFUSED 127.0.0.1` 特征）就立刻切直连
+重试 60 秒，之后自动再试代理——代理恢复后无需人工干预。
+
 ## 0.5.1 — 2026-10-26
 
 修一个 0.5.0 上线后才暴露的致命 bug：**几乎所有工具在宿主里实调都会失败**。
