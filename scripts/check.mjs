@@ -42,14 +42,17 @@ if (pkg) {
 console.log("\n=== 2. 必需文件 ===");
 const required = [
   "package.json", "cordis.patch.yml", "README.md", "INSTALL.md",
-  "CHANGELOG.md", "LICENSE", ".gitignore",
+  "CHANGELOG.md", "LICENSE",
   "lib/index.js", "lib/api.js", "lib/token.js", "lib/search.js",
   "lib/format.js", "lib/download.js", "lib/cards.js", "lib/plugins.js",
 ];
 for (const f of required) {
   if (!fs.existsSync(path.join(root, f))) fail(`缺文件 ${f}`);
 }
-ok(`${required.length} 个必需文件齐全`);
+if (fs.existsSync(path.join(root, ".git")) && !fs.existsSync(path.join(root, ".gitignore"))) {
+  fail("Git 仓库缺少 .gitignore");
+}
+ok(`${required.length} 个发布必需文件齐全`);
 
 // ---------- 3. 每个源文件能否解析 ----------
 console.log("\n=== 3. 语法检查 ===");
@@ -72,6 +75,15 @@ for (const f of srcFiles) {
   }
 }
 ok(`${srcFiles.length} 个 js/mjs 文件语法正确`);
+
+// ---------- 3.5 纯函数单元测试 ----------
+console.log("\n=== 3.5 单元测试 ===");
+try {
+  execFileSync(process.execPath, [path.join(root, "test/unit.mjs")], { stdio: "pipe" });
+  ok("test/unit.mjs 全部断言通过");
+} catch (e) {
+  fail(`单元测试失败: ${String(e.stderr || e.message).split("\n")[0]}`);
+}
 
 // ---------- 4. 工具注册一致性 ----------
 console.log("\n=== 4. 工具注册 ===");

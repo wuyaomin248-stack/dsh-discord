@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.5.5 — 2026-10-28
+
+**新增 4 个只读工具（总计 29 个工具）**
+
+- `discord_mentions`：收件箱支持。调取 `/users/@me/mentions`，获取最近在哪个服务器/频道被谁提及的消息列表。
+- `discord_me_in_guild`：查询自身在指定服务器的成员档案（`/guilds/{guildId}/members/{userId}`），获取服务器专属昵称、入服时间、角色 ID 与可读角色名、禁言状态（`communication_disabled_until`）。
+- `discord_events`：查看服务器计划活动（Scheduled Events，`/guilds/{guildId}/scheduled-events`），含活动名、描述、起止时间、地点/频道与订阅人数。
+- `discord_capabilities`：一键端点与权限自检，探测当前 token 在指定服务器和全局的端点可用性；403 归入权限缺失，其他状态/网络故障单列。
+
+**搜索与解析能力补全**
+
+- `discord_search` 接入 `pinned`（只搜置顶消息，实测有效）与 `includeNsfw` 过滤；NSFW 模式下 Discord 的 `total_results` 可能异常偏大，但实测 offset 翻页仍返回有效分页。
+- `discord_export` 接入 `pinned` 参数。
+- `discord_user` 自动扩展查询完整资料（`/users/{id}/profile`），补齐 bio、pronouns、已绑定平台（GitHub/Steam 等）及互关服务器（`mutualGuilds`）。
+- `compactMessage` 补全 `components`（交互按钮与下拉菜单）文本提取，避免带交互的消息只剩空壳。
+
+**工程与测试**
+
+- 新增 `test/unit.mjs` 纯函数单元测试（标记清洗、紧凑化、组件提取、Snowflake 时间戳、分页解析、Markdown 生成），零网络零 token 毫秒级跑通。
+- `scripts/check.mjs` 离线自检与 CI 自动化集成单元测试执行；`test/unit.mjs` 随 npm 包发布，真实 API 测试脚本仍只留在仓库开发环境。
+- 移除指向未打包 live 脚本的 `test:load` / `test:smoke` 等 npm script；开发树内按 `node test/<名称>.mjs` 运行。
+- npm tarball 自身执行 `node scripts/check.mjs` 通过；自检在 Git checkout 要求 `.gitignore`，在已打包 npm 环境不要求。
+- `discord_capabilities` 只把 403 归为权限受限；404、429、网络错误进入 `errors`，避免误诊。
+
 ## 0.5.4 — 2026-10-28
 
 纯仓库整理，工具行为零改动（25 个工具、参数、输出全部沿用 0.5.3）。

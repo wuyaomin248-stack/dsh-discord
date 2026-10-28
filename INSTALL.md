@@ -1,6 +1,6 @@
 # 安装说明
 
-dsh-discord 是 DSH Desktop 的插件，**25 个只读工具**，用于 Discord 搜索与信息获取。
+dsh-discord 是 DSH Desktop 的插件，**29 个只读工具**，用于 Discord 搜索与信息获取。
 
 ## 装到哪
 
@@ -20,7 +20,7 @@ git clone https://github.com/wuyaomin248-stack/dsh-discord.git \
 编辑 `profiles/desktop/package.json`，**两处都要加，缺一不加载**：
 
 ```json
-"dependencies":        { "dsh-discord": "^0.5.4" }
+"dependencies":        { "dsh-discord": "^0.5.5" }
 "dsh.profile.bundles": [ "dsh-discord" ]
 ```
 
@@ -72,7 +72,7 @@ dsh-discord/
 ├── CHANGELOG.md          版本记录
 ├── docs/NOTES.md         实现笔记（坑、判型细节、接口限制）
 ├── lib/
-│   ├── index.js          25 个工具的定义与注册
+│   ├── index.js          29 个工具的定义与注册
 │   ├── api.js            Discord REST 客户端（限速/重试/代理）
 │   ├── token.js          从浏览器 leveldb 抓 token
 │   ├── search.js         服务端搜索 + 本地过滤 + 上下文窗口拆解
@@ -81,15 +81,17 @@ dsh-discord/
 │   ├── cards.js          角色卡抽选（候选收集 / 验证 / 随机）
 │   └── plugins.js        插件判型（zip 中央目录 / 单文件脚本）
 ├── scripts/              check.mjs（离线自检）、link-deps.mjs
-└── test/                 实测脚本（不随 npm 包发布）
+└── test/                 unit.mjs 随包提供；其余实测脚本留在仓库
 ```
 
 ## 自测脚本
 
-装好依赖解析后可以单独跑（不经过 DSH）：
+在仓库开发副本中：
 
 ```bash
-node test/load.mjs       # 插件加载 + 25 个工具注册（不联网、不需要 token）
+node scripts/check.mjs    # 离线结构/语法/工具数/敏感信息检查 + unit.mjs
+node test/unit.mjs       # 纯函数单元测试，无网络、无 token
+node test/load.mjs       # 真实 API 冒烟，需浏览器登录态或 DISCORD_TOKEN + 网络
 node test/smoke.mjs      # 抓 token + 打通 API
 node test/scenario.mjs   # 真实搜索场景
 node test/format.mjs     # 标记清洗 + 频道名补齐
@@ -99,7 +101,7 @@ node test/archive.mjs    # 整频道归档
 node test/tools.mjs      # 查人 / 服务器详情 / 切账号 / 时间过滤
 ```
 
-`test/load.mjs` 不需要网络也不需要 token，可用来确认 25 个工具全部注册成功。
+安装包只包含 `test/unit.mjs`；其余需要真实账号/网络的脚本仅留在源码仓库。
 
 ## 安全
 
