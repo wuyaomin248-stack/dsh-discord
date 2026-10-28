@@ -1,4 +1,4 @@
-name: check
+name: checks
 
 on:
   push:
@@ -8,25 +8,20 @@ on:
 
 jobs:
   offline:
-    runs-on: ubuntu-latest
+    name: offline (${{ matrix.os }}, node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [20, 22]
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ matrix.node }}
 
-      - name: 离线自检
-        run: node scripts/check.mjs
-
-  syntax:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: 语法与结构（Windows 路径分支）
-        run: node scripts/check.mjs
+      # 离线自检：结构、语法、工具数、敏感信息、README 工具表一致性。
+      # 同时覆盖 POSIX 与 Windows 路径分支。
+      - run: node scripts/check.mjs

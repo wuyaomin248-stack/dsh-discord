@@ -1,7 +1,7 @@
 /** 实测 discord_archive：拉整个频道/帖子历史并落盘。 */
 const reg = [];
 const ctx = { logger:{info(){},warn(){},error(){}}, effect(){}, tools:{register(t){reg.push(t);return()=>{}}} };
-const m = await import("./lib/index.js");
+const m = await import("../lib/index.js");
 m.apply(ctx, {});
 const T = (n) => reg.find((t) => t.name === n);
 

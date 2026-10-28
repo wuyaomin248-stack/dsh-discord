@@ -5,7 +5,7 @@
  * 需要本机浏览器里登录过 discord.com（真实 token + 真实 API）。
  * 用法：node test-050-tools.mjs
  */
-import * as plugin from "./lib/index.js";
+import * as plugin from "../lib/index.js";
 
 const tools = new Map();
 plugin.apply(

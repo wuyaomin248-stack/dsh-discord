@@ -5,7 +5,7 @@ const ctx = {
   effect() {},
   tools: { register(t) { reg.push(t); return () => {}; } },
 };
-const m = await import("./lib/index.js");
+const m = await import("../lib/index.js");
 m.apply(ctx, {});
 const T = (n) => reg.find((t) => t.name === n);
 

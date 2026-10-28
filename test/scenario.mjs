@@ -1,10 +1,10 @@
 /**
  * 场景测试：模拟用户真实用法——搜索关键词、按时间筛、跨频道找。
  */
-import { harvestTokens, tokenFromEnv } from "./lib/token.js";
-import { getMe, getGuilds, getGuildChannels } from "./lib/api.js";
-import { searchGuild, filterChannel, filterGuild, snowflakeForDate } from "./lib/search.js";
-import { compactMessage, compactChannel } from "./lib/format.js";
+import { harvestTokens, tokenFromEnv } from "../lib/token.js";
+import { getMe, getGuilds, getGuildChannels } from "../lib/api.js";
+import { searchGuild, filterChannel, filterGuild, snowflakeForDate } from "../lib/search.js";
+import { compactMessage, compactChannel } from "../lib/format.js";
 
 const GUILD = "1134557553011998840"; // 类脑ΟΔΥΣΣΕΙΑ
 

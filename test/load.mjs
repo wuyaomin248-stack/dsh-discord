@@ -61,7 +61,7 @@ const fakeCtx = {
 };
 
 console.log("=== 1. import 插件模块 ===");
-const mod = await import("./lib/index.js");
+const mod = await import("../lib/index.js");
 console.log("  name:", mod.name);
 console.log("  inject:", JSON.stringify(mod.inject));
 console.log("  Config 存在:", typeof mod.Config === "function" || typeof mod.Config === "object");

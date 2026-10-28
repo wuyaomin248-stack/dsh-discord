@@ -6,7 +6,7 @@ const fakeCtx = {
   tools: { register(t) { registered.push(t); return () => {}; } },
 };
 
-const mod = await import("./lib/index.js");
+const mod = await import("../lib/index.js");
 mod.apply(fakeCtx, {});
 
 const tool = registered.find((t) => t.name === "discord_export");

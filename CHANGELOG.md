@@ -1,5 +1,37 @@
 # Changelog
 
+## 0.5.4 — 2026-10-28
+
+纯仓库整理，工具行为零改动（25 个工具、参数、输出全部沿用 0.5.3）。
+
+**目录不再根目录堆脚本**
+
+- 8 个实测脚本从根目录挪进 `test/` 并去掉 `test-`/`verify-` 前缀，按用途命名：
+  `load.mjs` `smoke.mjs` `scenario.mjs` `format.mjs` `export.mjs` `plugins.mjs` `archive.mjs` `tools.mjs`
+  （原 `load-test.mjs` / `smoke.mjs` / `scenario.mjs` / `verify-improve.mjs` / `verify-export.mjs` /
+  `test-plugin-tools.mjs` / `test-archive.mjs` / `test-050-tools.mjs`）。
+- 脚本内 `./lib/*` 导入改为 `../lib/*`；`package.json` scripts 同步（`test:050` → `test:tools`）。
+- `test/` 不进 npm 包（`files` 未包含），装进 DSH 的用户不会多拿 8 个脚本。
+
+**文档拆成四份，各管一件事**
+
+- `README.md` 310 → 约 180 行：安装/工具表/常用姿势/输出处理/限制/开发，去掉与 INSTALL 重复的安装细节。
+- 新增 `docs/NOTES.md`：踩坑、角色卡与插件判型实测数据、普通 token 拿不到的端点、服务端搜索返回形状。
+- `INSTALL.md`：版本号改 `^0.5.4`、路径树补 `test/` 与 `docs/`、自测命令改新路径。
+- 修 README 徽章版本号（原还写 0.5.2）。
+
+**修 `link-deps.mjs` 找不到依赖**
+
+- 原来硬要求 `dsh-tools` / `schemastery` / `cordis` 三个包同时存在，而 `cordis` 是可选 peer、本机往往没有，
+  于是「明明已解析好」也报「找不到 DSH 安装目录」。改为硬要求前两个、`cordis` 有则链没有则跳过。
+- 候选路径补 `~/.dsh/profiles/desktop`（DSH 实际在用的那份），并修「直接给 `@deepseek-ai` 目录」
+  分支少上溯一层的问题。
+
+**CI**
+
+- 两个 job 跑同一条命令改为一个 matrix：`ubuntu-latest` + `windows-latest` × node 20 / 22，`fail-fast: false`。
+  路径分支覆盖不变，作业数 2 → 4。
+
 ## 0.5.3 — 2026-10-27
 
 **修 25 个工具全部实调失败：`output.render failed: userRender is not a function`**

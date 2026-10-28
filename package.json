@@ -1,6 +1,6 @@
 {
   "name": "dsh-discord",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Discord read/search toolkit for DeepSeek Harness: pull the signed-in token straight from Edge/Chrome leveldb, then search messages, archive whole channels, read context, download attachments with card/plugin detection, and pick random verified cards or plugins — all read-only, no browser needed.",
   "type": "module",
   "main": "lib/index.js",
@@ -38,16 +38,16 @@
   "homepage": "https://github.com/wuyaomin248-stack/dsh-discord#readme",
   "scripts": {
     "check": "node scripts/check.mjs",
+    "test": "node scripts/check.mjs",
     "link-deps": "node scripts/link-deps.mjs",
-    "test:load": "node load-test.mjs",
-    "test:smoke": "node smoke.mjs",
-    "test:scenario": "node scenario.mjs",
-    "test:format": "node verify-improve.mjs",
-    "test:export": "node verify-export.mjs",
-    "test:plugins": "node test-plugin-tools.mjs",
-    "test:archive": "node test-archive.mjs",
-    "test:050": "node test-050-tools.mjs",
-    "test": "node scripts/check.mjs"
+    "test:load": "node test/load.mjs",
+    "test:smoke": "node test/smoke.mjs",
+    "test:scenario": "node test/scenario.mjs",
+    "test:format": "node test/format.mjs",
+    "test:export": "node test/export.mjs",
+    "test:plugins": "node test/plugins.mjs",
+    "test:archive": "node test/archive.mjs",
+    "test:tools": "node test/tools.mjs"
   },
   "engines": {
     "node": ">=20"

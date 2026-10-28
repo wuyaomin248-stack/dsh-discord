@@ -2,10 +2,10 @@
  * 冒烟测试：验证 token 抓取、API 调用、搜索三条链路都能跑通。
  * 直接跑 node smoke.mjs。
  */
-import { harvestTokens, tokenFromEnv, maskToken, userIdFromToken } from "./lib/token.js";
-import { getMe, getGuilds, getGuildChannels, getMessages } from "./lib/api.js";
-import { searchGuild, snowflakeForDate, dateFromSnowflake } from "./lib/search.js";
-import { compactUser, compactGuild, compactChannel, compactMessage } from "./lib/format.js";
+import { harvestTokens, tokenFromEnv, maskToken, userIdFromToken } from "../lib/token.js";
+import { getMe, getGuilds, getGuildChannels, getMessages } from "../lib/api.js";
+import { searchGuild, snowflakeForDate, dateFromSnowflake } from "../lib/search.js";
+import { compactUser, compactGuild, compactChannel, compactMessage } from "../lib/format.js";
 
 const ok = (label, extra = "") => console.log("  ✓", label, extra);
 const bad = (label, e) => console.log("  ✗", label, "—", e?.message || e);

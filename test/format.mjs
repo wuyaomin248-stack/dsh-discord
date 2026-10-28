@@ -1,10 +1,10 @@
 /**
  * 验证改进：频道名、命中标记、标记清洗、embed、导出。
  */
-import { harvestTokens, tokenFromEnv } from "./lib/token.js";
-import { getMe } from "./lib/api.js";
-import { searchGuild, explicateSearchResults } from "./lib/search.js";
-import { compactMessage, cleanContent, groupByChannel, toMarkdown } from "./lib/format.js";
+import { harvestTokens, tokenFromEnv } from "../lib/token.js";
+import { getMe } from "../lib/api.js";
+import { searchGuild, explicateSearchResults } from "../lib/search.js";
+import { compactMessage, cleanContent, groupByChannel, toMarkdown } from "../lib/format.js";
 
 const GUILD = "1134557553011998840";
 let tokens = tokenFromEnv();
@@ -43,7 +43,7 @@ if (withCtx[0]) {
 }
 
 // 补频道名——复刻插件里的补名逻辑（帖子要逐个查）
-const { getGuildChannels, getChannel } = await import("./lib/api.js");
+const { getGuildChannels, getChannel } = await import("../lib/api.js");
 const chs = await getGuildChannels(tok, GUILD);
 const names = new Map(chs.map((c) => [c.id, c.name]));
 const missing = [...new Set(groups.map((g) => g.message.channel_id))].filter(
